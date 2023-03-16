@@ -23,7 +23,7 @@ jobs:
           ATLANTIS_GH_TOKEN: ${{ github.token }}
           ATLANTIS_LOG_LEVEL: debug
           ATLANTIS_LOCKING_DB_TYPE: redis
-          ATLANTIS_REDIS_HOST: localhost
+          ATLANTIS_REDIS_HOST: redis
           ATLANTIS_REPO_ALLOWLIST: 'github.com/danielgblanco/atlantis-gha-poc'
 
     steps:
