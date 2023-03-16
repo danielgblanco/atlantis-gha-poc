@@ -1,0 +1,7 @@
+version: 3
+automerge: true
+delete_source_branch_on_merge: true
+
+projects:
+  # Projects using Terragrunt
+  - dir: config/test1
