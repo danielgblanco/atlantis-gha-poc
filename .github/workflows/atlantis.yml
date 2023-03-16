@@ -21,15 +21,33 @@ jobs:
         ports:
           - 4141:4141
         env:
-          ATLANTIS_GH_USER: ${{ github.triggering_actor }}
-          ATLANTIS_GH_TOKEN: ${{ github.token }}
+          ATLANTIS_GH_USER: ${{ github.actor }}
+          ATLANTIS_GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 #          ATLANTIS_LOG_LEVEL: debug
           ATLANTIS_LOCKING_DB_TYPE: redis
           ATLANTIS_REDIS_HOST: redis
           ATLANTIS_REPO_ALLOWLIST: 'github.com/danielgblanco/atlantis-gha-poc'
 
     steps:
-      # Pass event to Atlantis
-      - name: Send event
+      - name: Wait for Atlantis to start
+        timeout-minutes: 1
         run: |
-          curl --request POST --header 'Content-Type: application/json' --header 'X-GitHub-Event: ${{ github.event_name }}' --header 'X-GitHub-Delivery: ${{ github.run_id }}' --data '${{ toJson(github.event) }}' http://localhost:4141/events && sleep 30
+          printf 'Waiting...'
+          until $(curl --output /dev/null --silent --head --fail http://localhost:4141/healthz); do
+              printf '.'
+              sleep 5
+          done
+      - name: Send event to Atlantis
+        run: |
+          curl --request POST \
+            --header 'Content-Type: application/json' \
+            --header 'X-GitHub-Event: ${{ github.event_name }}' \
+            --header 'X-GitHub-Delivery: ${{ github.run_id }}' \
+            --data '${{ toJson(github.event) }}' \
+            http://localhost:4141/events
+      - name: Wait for Atlantis to finish
+        uses: fountainhead/action-wait-for-check@v1.1.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          checkName: atlantis/plan
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
