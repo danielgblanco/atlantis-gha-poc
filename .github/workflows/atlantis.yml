@@ -25,7 +25,6 @@ jobs:
           ATLANTIS_LOCKING_DB_TYPE: redis
           ATLANTIS_REDIS_HOST: localhost
           ATLANTIS_REPO_ALLOWLIST: 'github.com/danielgblanco/atlantis-gha-poc'
-          ATLANTIS_REPO_CONFIG: atlantis_repo.yml
 
     steps:
       # Pass event to Atlantis
