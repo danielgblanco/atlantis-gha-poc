@@ -14,6 +14,8 @@ jobs:
         image: redis
       atlantis:
         image: ghcr.io/runatlantis/atlantis:v0.23.2
+        ports:
+          - 4141:4141
         env:
           ATLANTIS_GH_USER: ${{ github.triggering_actor }}
           ATLANTIS_GH_TOKEN: ${{ github.token }}
@@ -25,11 +27,7 @@ jobs:
     steps:
       # Pass event to Atlantis
       - name: Send event
-        uses: actionsflow/axios@v1
-        with:
-          url: http://atlantis:4141/events
-          method: 'POST'
-          data: ${{ github.event }}
+        run: "curl -X POST -H 'Content-Type: application/json' --data '${{ toJson(github.event) }}' http://localhost:4141/events"
       # Sleep
       - name: Sleep
         run: sleep 10
