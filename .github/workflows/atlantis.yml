@@ -9,7 +9,7 @@ jobs:
   atlantis:
     name: 'Atlantis'
     runs-on: ubuntu-latest
-    container: "runatlantis/atlantis:v0.23.2"
+    container: "ghcr.io/runatlantis/atlantis:v0.23.2"
 
     steps:
       # Checkout the repository to the GitHub Actions runner
