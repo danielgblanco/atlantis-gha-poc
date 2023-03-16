@@ -9,29 +9,23 @@ jobs:
   atlantis:
     name: 'Atlantis'
     runs-on: ubuntu-latest
-    container:
-      image: "ghcr.io/runatlantis/atlantis:v0.23.2"
-      env:
-        ATLANTIS_LOG_LEVEL: debug
-        ATLANTIS_LOCKING_DB_TYPE: redis
-        ATLANTIS_REDIS_HOST: localhost
-        ATLANTIS_REPO_CONFIG: atlantis_repo.yml
+    services:
+      redis:
+        image: redis
+        ports:
+          - 6379/tcp
+      atlantis:
+        image: ghcr.io/runatlantis/atlantis:v0.23.2
+        env:
+          ATLANTIS_LOG_LEVEL: debug
+          ATLANTIS_LOCKING_DB_TYPE: redis
+          ATLANTIS_REDIS_HOST: localhost
+          ATLANTIS_REPO_CONFIG: atlantis_repo.yml
 
     steps:
-      # Checkout the repository to the GitHub Actions runner
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      # Only for testing, normally would use external Redis
-      - name: Start Redis
-        uses: supercharge/redis-github-action@1.5.0
-        with:
-          redis-version: 6
-
       # Pass event to Atlantis
       - name: Send event
         run: "curl -X POST -H 'Content-Type: application/json' --data '${{ github.event }}' http://localhost:6379/events"
-
-      - name: Dump docker logs on failure
-        if: failure()
-        uses: jwalton/gh-docker-logs@v2
+      # Sleep
+      - name: Sleep
+        run: sleep 10
