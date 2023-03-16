@@ -30,4 +30,4 @@ jobs:
           url: http://atlantis:4141/events
           method: POST
           customHeaders: '{"Content-Type": "application/json"}'
-          data: '${{ toJson(github.event.client_payload) }}'
+          data: '${{ toJson(github.event) }}'
