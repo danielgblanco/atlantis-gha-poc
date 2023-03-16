@@ -14,8 +14,6 @@ jobs:
         image: redis
       atlantis:
         image: ghcr.io/runatlantis/atlantis:v0.23.2
-        ports:
-          - 4141:4141
         env:
           ATLANTIS_GH_USER: ${{ github.triggering_actor }}
           ATLANTIS_GH_TOKEN: ${{ github.token }}
@@ -27,4 +25,9 @@ jobs:
     steps:
       # Pass event to Atlantis
       - name: Send event
-        run: "curl -X POST -H 'Content-Type: application/json' --data '${{ toJson(github.event) }}' http://localhost:4141/events && sleep 30"
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: http://atlantis:4141/events
+          method: POST
+          customHeaders: '{"Content-Type": "application/json"}'
+          data: '${{ toJson(github.event.client_payload) }}'
