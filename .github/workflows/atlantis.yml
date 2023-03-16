@@ -16,7 +16,11 @@ jobs:
           - 6379/tcp
       atlantis:
         image: ghcr.io/runatlantis/atlantis:v0.23.2
+        ports:
+          - 4141/tcp
         env:
+          ATLANTIS_GH_USER: ${{ github.triggering_actor }}
+          ATLANTIS_GH_TOKEN: ${{ github.token }}
           ATLANTIS_LOG_LEVEL: debug
           ATLANTIS_LOCKING_DB_TYPE: redis
           ATLANTIS_REDIS_HOST: localhost
@@ -25,7 +29,7 @@ jobs:
     steps:
       # Pass event to Atlantis
       - name: Send event
-        run: "curl -X POST -H 'Content-Type: application/json' --data '${{ github.event }}' http://localhost:6379/events"
+        run: "curl -X POST -H 'Content-Type: application/json' --data '${{ github.event }}' http://localhost:4141/events"
       # Sleep
       - name: Sleep
         run: sleep 10
