@@ -28,8 +28,8 @@ jobs:
           redis-version: 6
 
       # Pass event to Atlantis
-      - name: Send PR
-        uses: fjogeleit/http-request-action@v1
+      - name: Send event
+        run: "curl -X POST -H 'Content-Type: application/json' --data '${{ github.event }}' http://localhost:6379/events"
         with:
           url: http://localhost:6379/events
           method: POST
