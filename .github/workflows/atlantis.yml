@@ -49,7 +49,7 @@ jobs:
         run: |
           printf 'Waiting...'
           sleep 5
-          until $(curl --silent http://localhost:4141/status | grep '\"in_progress_operations\": 0'); do
+          until $(curl --silent http://localhost:4141/status | grep '\\"in_progress_operations\\": 0'); do
               printf '.'
               sleep 5
           done
