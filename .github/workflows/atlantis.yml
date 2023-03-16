@@ -1,0 +1,17 @@
+name: 'Atlantis'
+
+on: pull_request
+
+permissions:
+  contents: read
+
+jobs:
+  atlantis:
+    name: 'Atlantis'
+    runs-on: ubuntu-latest
+    container: "runatlantis/atlantis:v0.23.2"
+
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout
+        uses: actions/checkout@v3
