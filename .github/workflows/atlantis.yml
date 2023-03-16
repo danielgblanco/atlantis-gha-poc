@@ -9,9 +9,28 @@ jobs:
   atlantis:
     name: 'Atlantis'
     runs-on: ubuntu-latest
-    container: "ghcr.io/runatlantis/atlantis:v0.23.2"
+    container:
+      image: "ghcr.io/runatlantis/atlantis:v0.23.2"
+      env:
+        ATLANTIS_LOCKING_DB_TYPE: redis
+        ATLANTIS_REDIS_HOST: localhost
+        ATLANTIS_REPO_CONFIG: atlantis_repo.yml
 
     steps:
       # Checkout the repository to the GitHub Actions runner
       - name: Checkout
         uses: actions/checkout@v3
+
+      # Only for testing, normally would use external Redis
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.5.0
+        with:
+          redis-version: 6
+
+      # Pass event to Atlantis
+      - name: Send PR
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: http://localhost:6379/events
+          method: POST
+          data: ${{ github.event }}
