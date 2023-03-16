@@ -27,7 +27,4 @@ jobs:
     steps:
       # Pass event to Atlantis
       - name: Send event
-        run: "curl -X POST -H 'Content-Type: application/json' --data '${{ toJson(github.event) }}' http://localhost:4141/events"
-      # Sleep
-      - name: Sleep
-        run: sleep 10
+        run: "curl -X POST -H 'Content-Type: application/json' --data '${{ toJson(github.event) }}' http://localhost:4141/events && sleep 30"
