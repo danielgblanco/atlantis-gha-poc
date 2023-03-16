@@ -29,7 +29,7 @@ jobs:
       - name: Send event
         uses: wei/curl@v1
         with:
-          args: "curl -X POST -H 'Content-Type: application/json' --data '${{ github.event }}' http://localhost:4141/events"
+          args: "-X POST -H 'Content-Type: application/json' --data '${{ github.event }}' http://atlantis:4141/events"
       # Sleep
       - name: Sleep
         run: sleep 10
