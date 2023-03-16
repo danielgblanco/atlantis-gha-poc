@@ -3,7 +3,11 @@ name: 'Atlantis'
 on: pull_request
 
 permissions:
-  contents: read
+  checks: write
+  contents: write
+  issues: write
+  pull-requests: write
+  statuses: write
 
 jobs:
   atlantis:
@@ -19,7 +23,7 @@ jobs:
         env:
           ATLANTIS_GH_USER: ${{ github.triggering_actor }}
           ATLANTIS_GH_TOKEN: ${{ github.token }}
-          ATLANTIS_LOG_LEVEL: debug
+#          ATLANTIS_LOG_LEVEL: debug
           ATLANTIS_LOCKING_DB_TYPE: redis
           ATLANTIS_REDIS_HOST: redis
           ATLANTIS_REPO_ALLOWLIST: 'github.com/danielgblanco/atlantis-gha-poc'
@@ -28,4 +32,4 @@ jobs:
       # Pass event to Atlantis
       - name: Send event
         run: |
-          curl --request POST --header 'Content-Type: application/json' --header 'X-GitHub-Event: ${{ github.event_name }}' --header 'X-GitHub-Delivery: ${{ github.run_id }}' --data '${{ toJson(github.event) }}' http://localhost:4141/events && sleep 30
+          curl --request POST --header 'Content-Type: application/x-www-form-urlencoded' --header 'X-GitHub-Event: ${{ github.event_name }}' --header 'X-GitHub-Delivery: ${{ github.run_id }}' --data '${{ toJson(github.event) }}' http://localhost:4141/events && sleep 30
