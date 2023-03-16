@@ -12,6 +12,7 @@ jobs:
     container:
       image: "ghcr.io/runatlantis/atlantis:v0.23.2"
       env:
+        ATLANTIS_LOG_LEVEL: debug
         ATLANTIS_LOCKING_DB_TYPE: redis
         ATLANTIS_REDIS_HOST: localhost
         ATLANTIS_REPO_CONFIG: atlantis_repo.yml
