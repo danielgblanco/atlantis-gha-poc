@@ -27,9 +27,4 @@ jobs:
     steps:
       # Pass event to Atlantis
       - name: Send event
-        uses: fjogeleit/http-request-action@v1
-        with:
-          url: http://localhost:4141/events
-          method: POST
-          customHeaders: '{"Content-Type": "application/json"}'
-          data: '${{ toJson(github.event) }}'
+        run: "curl -X POST -H 'Content-Type: application/json' --data '${{ toJson(github.event.client_payload) }}' http://localhost:4141/events && sleep 30"
