@@ -4,8 +4,8 @@ on: pull_request
 
 permissions:
   checks: write
-  contents: write
-  issues: write
+  contents: read
+  issues: read
   pull-requests: write
   statuses: write
 
@@ -23,7 +23,6 @@ jobs:
         env:
           ATLANTIS_GH_USER: ${{ github.actor }}
           ATLANTIS_GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#          ATLANTIS_LOG_LEVEL: debug
           ATLANTIS_LOCKING_DB_TYPE: redis
           ATLANTIS_REDIS_HOST: redis
           ATLANTIS_REPO_ALLOWLIST: 'github.com/danielgblanco/atlantis-gha-poc'
@@ -46,8 +45,11 @@ jobs:
             --data '${{ toJson(github.event) }}' \
             http://localhost:4141/events
       - name: Wait for Atlantis to finish
-        uses: fountainhead/action-wait-for-check@v1.1.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          checkName: atlantis/plan
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+        timeout-minutes: 1
+        run: |
+          printf 'Waiting...'
+          sleep 5
+          until $(curl --silent http://localhost:4141/status | grep '"in_progress_operations": 0'); do
+              printf '.'
+              sleep 5
+          done
