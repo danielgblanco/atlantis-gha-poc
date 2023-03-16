@@ -30,7 +30,3 @@ jobs:
       # Pass event to Atlantis
       - name: Send event
         run: "curl -X POST -H 'Content-Type: application/json' --data '${{ github.event }}' http://localhost:6379/events"
-        with:
-          url: http://localhost:6379/events
-          method: POST
-          data: ${{ github.event }}
