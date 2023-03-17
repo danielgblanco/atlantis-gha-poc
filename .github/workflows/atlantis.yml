@@ -21,22 +21,22 @@ jobs:
         ports:
           - 4141:4141
         env:
-          ATLANTIS_DATA_DIR: /atlantis-data
+          ATLANTIS_DATA_DIR: /atlantis-cache
           ATLANTIS_GH_USER: ${{ github.actor }}
           ATLANTIS_GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ATLANTIS_LOCKING_DB_TYPE: redis
           ATLANTIS_REDIS_HOST: redis
           ATLANTIS_REPO_ALLOWLIST: github.com/${{ github.repository }}
         volumes:
-          - /atlantis-data:/atlantis-data
+          - /atlantis-cache:/atlantis-cache
 
     steps:
       - name: Cache Atlantis data
         id: cache-atlantis-data
         uses: actions/cache@v3
         with:
-          path: /atlantis-data
-          key: atlantis-data
+          path: /atlantis-cache
+          key: atlantis-cache
       - name: Wait for Atlantis to start
         id: atlantis-start
         timeout-minutes: 1
