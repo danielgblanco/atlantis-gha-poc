@@ -1,66 +1,75 @@
 name: 'Atlantis'
 
-on: pull_request
+on:
+  pull_request:
+  pull_request_review:
+  issue_comment:
+    types:
+      - created
 
 permissions:
   checks: write
   contents: read
-  issues: read
+  issues: write
   pull-requests: write
   statuses: write
 
 jobs:
+
   atlantis:
-    name: 'Atlantis'
+    name: Atlantis
     runs-on: ubuntu-latest
     services:
       redis:
         image: redis
-      atlantis:
-        image: ghcr.io/runatlantis/atlantis:v0.23.2
-        ports:
-          - 4141:4141
-        env:
-          ATLANTIS_DATA_DIR: /atlantis-cache
-          ATLANTIS_GH_USER: ${{ github.actor }}
-          ATLANTIS_GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ATLANTIS_LOCKING_DB_TYPE: redis
-          ATLANTIS_REDIS_HOST: redis
-          ATLANTIS_REPO_ALLOWLIST: github.com/${{ github.repository }}
-        volumes:
-          - /atlantis-cache:/atlantis-cache
-
+    container:
+      image: ghcr.io/runatlantis/atlantis:v0.23.2-debian
+      ports:
+        - 4141:4141
+      env:
+        ATLANTIS_GH_USER: ${{ github.actor }}
+        ATLANTIS_GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        ATLANTIS_LOCKING_DB_TYPE: redis
+        ATLANTIS_REDIS_HOST: redis
+        ATLANTIS_REPO_ALLOWLIST: github.com/${{ github.repository }}
+      volumes:
+        - ${{ github.workspace }}/atlantis-data:/home/atlantis/.atlantis
+      options: --user root
     steps:
       - name: Cache Atlantis data
         id: cache-atlantis-data
         uses: actions/cache@v3
         with:
-          path: /atlantis-cache
-          key: atlantis-cache
-      - name: Wait for Atlantis to start
-        id: atlantis-start
+          path: ${{ github.workspace }}/atlantis-data
+          key: ${{ github.ref }}
+
+      - name: Run Atlantis
         timeout-minutes: 1
         run: |
-          printf 'Waiting...'
+          # Start server in background
+          atlantis server &
+          pid=$!
+          
+          # Wait for Atlantis to start
           until curl --output /dev/null --silent --fail http://localhost:4141/healthz; do
-              printf '.'
-              sleep 5
+            printf '.'
+            sleep 5
           done
-      - name: Send event to Atlantis
-        id: atlantis-event
-        run: |
-          curl --request POST \
+          
+          # Relay event
+          curl --silent --request POST \
             --header 'Content-Type: application/json' \
             --header 'X-GitHub-Event: ${{ github.event_name }}' \
             --header 'X-GitHub-Delivery: ${{ github.run_id }}' \
             --data '${{ toJson(github.event) }}' \
             http://localhost:4141/events
-      - name: Wait for Atlantis to finish
-        id: atlantis-finish
-        timeout-minutes: 1
-        run: |
-          printf 'Waiting...'
+          
+          # Wait for Atlantis to run
           sleep 5
           until curl --silent http://localhost:4141/status | grep '"in_progress_operations": 0'; do
-              sleep 5
+            sleep 5
           done
+          
+          # Kill Atlantis and wait
+          kill $pid
+          wait $pid
