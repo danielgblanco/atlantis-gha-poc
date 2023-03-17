@@ -3,5 +3,6 @@ automerge: true
 delete_source_branch_on_merge: true
 
 projects:
-  # Projects using Terragrunt
   - dir: config/test1
+  - dir: config/test2
+
