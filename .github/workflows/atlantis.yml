@@ -1,8 +1,6 @@
 name: 'Atlantis'
 
 on:
-  pull_request:
-  pull_request_review:
   issue_comment:
     types:
       - created
@@ -30,6 +28,7 @@ jobs:
         ATLANTIS_LOCKING_DB_TYPE: redis
         ATLANTIS_REDIS_HOST: redis
         ATLANTIS_REPO_ALLOWLIST: github.com/${{ github.repository }}
+        ATLANTIS_DISABLE_AUTOPLAN: true
       options: --user root
       volumes:
         - ${{ github.workspace }}/atlantis-data:/home/atlantis/.atlantis
@@ -38,8 +37,8 @@ jobs:
         id: cache-atlantis-data
         uses: actions/cache@v3
         with:
-          path: /home/atlantis/.atlantis
-          key: ${{ format('atlantis-data-{0}{1}', github.event.issue.number, github.event.number) }}
+          path: ${{ github.workspace }}/atlantis-data/.atlantis
+          key: atlantis-data-${{ github.event.issue.number }}
 
       - name: Run Atlantis
         timeout-minutes: 1
