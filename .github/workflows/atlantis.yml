@@ -24,24 +24,22 @@ jobs:
         image: redis
     container:
       image: ghcr.io/runatlantis/atlantis:v0.23.2-debian
-      ports:
-        - 4141:4141
       env:
         ATLANTIS_GH_USER: ${{ github.actor }}
         ATLANTIS_GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         ATLANTIS_LOCKING_DB_TYPE: redis
         ATLANTIS_REDIS_HOST: redis
         ATLANTIS_REPO_ALLOWLIST: github.com/${{ github.repository }}
+      options: --user root
       volumes:
         - ${{ github.workspace }}/atlantis-data:/home/atlantis/.atlantis
-      options: --user root
     steps:
       - name: Cache Atlantis data
         id: cache-atlantis-data
         uses: actions/cache@v3
         with:
-          path: ${{ github.workspace }}/atlantis-data
-          key: ${{ github.ref }}
+          path: /home/atlantis/.atlantis
+          key: ${{ format('atlantis-data-{0}{1}', github.event.issue.number, github.event.number) }}
 
       - name: Run Atlantis
         timeout-minutes: 1
@@ -52,7 +50,6 @@ jobs:
           
           # Wait for Atlantis to start
           until curl --output /dev/null --silent --fail http://localhost:4141/healthz; do
-            printf '.'
             sleep 5
           done
           
@@ -69,7 +66,3 @@ jobs:
           until curl --silent http://localhost:4141/status | grep '"in_progress_operations": 0'; do
             sleep 5
           done
-          
-          # Kill Atlantis and wait
-          kill $pid
-          wait $pid
