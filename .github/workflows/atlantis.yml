@@ -47,7 +47,7 @@ jobs:
         run: |
           # Start server in background
           atlantis server &
-          pid=$!
+          atlantis_pid=$!
           
           # Wait for Atlantis to start
           until curl --output /dev/null --silent --fail http://localhost:4141/healthz; do
@@ -67,3 +67,7 @@ jobs:
           until curl --silent http://localhost:4141/status | grep '"in_progress_operations": 0'; do
             sleep 5
           done
+          
+          # Wait for Atlantis to exit gracefully (GitHub Actions sends SIGKILL instead of SIGTERM at the end)
+          kill $atlantis_pid
+          wait $atlantis_pid
