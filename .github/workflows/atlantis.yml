@@ -1,7 +1,7 @@
 name: 'Atlantis'
 
 on:
-  pull_request:
+  # Issue comments target default branch so workflow definition in main (rather than PR) is used
   issue_comment:
     types:
       - created
