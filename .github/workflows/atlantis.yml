@@ -24,6 +24,7 @@ jobs:
     container:
       image: ghcr.io/runatlantis/atlantis:v0.23.2-debian
       env:
+        ATLANTIS_DATA_DIR: /atlantis-data
         ATLANTIS_GH_USER: ${{ github.actor }}
         ATLANTIS_GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         ATLANTIS_LOCKING_DB_TYPE: redis
@@ -31,14 +32,14 @@ jobs:
         ATLANTIS_REPO_ALLOWLIST: github.com/${{ github.repository }}
         ATLANTIS_DISABLE_AUTOPLAN: true
       options: --user root
-#      volumes:
-#        - ${{ github.workspace }}/atlantis-data:/home/atlantis/.atlantis
+      volumes:
+        - ${{ github.workspace }}/atlantis-data:/atlantis-data
     steps:
       - name: Cache Atlantis data
         id: cache-atlantis-data
         uses: actions/cache@v3
         with:
-          path: /home/atlantis/.atlantis
+          path: /atlantis-data
           key: atlantis-data-${{ github.event.issue.number }}
 
       - name: Run Atlantis
