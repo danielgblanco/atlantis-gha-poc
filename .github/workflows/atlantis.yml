@@ -30,14 +30,14 @@ jobs:
         ATLANTIS_REPO_ALLOWLIST: github.com/${{ github.repository }}
         ATLANTIS_DISABLE_AUTOPLAN: true
       options: --user root
-      volumes:
-        - ${{ github.workspace }}/atlantis-data:/home/atlantis/.atlantis
+#      volumes:
+#        - ${{ github.workspace }}/atlantis-data:/home/atlantis/.atlantis
     steps:
       - name: Cache Atlantis data
         id: cache-atlantis-data
         uses: actions/cache@v3
         with:
-          path: ${{ github.workspace }}/atlantis-data/.atlantis
+          path: /home/atlantis/.atlantis
           key: atlantis-data-${{ github.event.issue.number }}
 
       - name: Run Atlantis
