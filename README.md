@@ -23,9 +23,12 @@ This has two side-effects:
    2. Having only `issue_comment` events triggering the build means that the action workflow to be used is the one
    present at the head of the default branch. This means that changes need to be merged for changes to workflows to be
    applied. This could be a positive, as changing the workflow could imply changing Atlantis server side config.
+   3. The `pull_request` event is kept as a trigger to allow Atlantis to unlock projects on PR close. The
+   `ATLANTIS_DISABLE_AUTOPLAN` option is used to only allow planning and applying (which use cache) via `issue_comment`.
 4. No AWS credentials are used in this PoC, but it'd be fairly simple to configure GitHub's OIDC provider with an AWS
 IAM Identity Provider endpoint to be able to assume a role (or use AWS key pairs).
 5. When `atlantis plan` or `atlantis apply` are executed, there's no immediate feedback in the pull request that those
 checks are running for this particular PR (this may already be the case).
 6. Due to the nature of GitHub Actions, this workflow has only be considered to run changes in Terraform modules
 contained within the same repo (i.e. not accepting events from other repos, or forks).
+7. Atlantis container has to be run as root for cache action to have permissions to mounted volume.
