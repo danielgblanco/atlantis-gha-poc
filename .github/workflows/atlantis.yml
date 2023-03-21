@@ -34,7 +34,7 @@ jobs:
         ATLANTIS_REDIS_HOST: redis
         ATLANTIS_REPO_ALLOWLIST: github.com/${{ github.repository }}
         ATLANTIS_DISABLE_AUTOPLAN: true
-      options: --user atlantis
+      options: --user root
       volumes:
         - ${{ github.workspace }}/atlantis-data:/atlantis-data
     steps:
