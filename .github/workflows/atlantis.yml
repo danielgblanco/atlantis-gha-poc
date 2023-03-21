@@ -12,6 +12,7 @@ permissions:
   issues: write
   pull-requests: write
   statuses: write
+#  id-token: write # Only needed for AWS creds to interact with GitHub's OIDC Token endpoint
 
 jobs:
   atlantis:
@@ -25,7 +26,7 @@ jobs:
       # Debian needed for GHA to use cache (uses /bin/tar --posix)
       image: ghcr.io/runatlantis/atlantis:v0.23.2-debian
       env:
-        # Volume outside of /home/atlantis needed for cache to have access to it
+        # Volume mounted outside of /home/atlantis needed for cache action to have privileges to it
         ATLANTIS_DATA_DIR: /atlantis-data
         ATLANTIS_GH_USER: ${{ github.actor }}
         ATLANTIS_GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -37,6 +38,13 @@ jobs:
       volumes:
         - ${{ github.workspace }}/atlantis-data:/atlantis-data
     steps:
+#      # Use GitHub's OIDC provider to with a configured AWS IAM Identity Provider endpoint to assume role
+#      - name: Configure AWS Credentials
+#        uses: aws-actions/configure-aws-credentials@v2
+#        with:
+#          role-to-assume: arn:aws:iam::123456789100:role/my-terraform-state-role
+#          aws-region: eu-west-1
+
       - name: Restore Atlantis data
         id: restore-atlantis-data
         uses: actions/cache/restore@v3
