@@ -51,6 +51,7 @@ jobs:
       - name: Restore Atlantis data
         id: restore-atlantis-data
         uses: actions/cache/restore@v3
+        if: github.event_name == 'issue_comment'
         with:
           path: /atlantis-data
           key: atlantis-data-${{ github.event.issue.number }}
@@ -88,6 +89,7 @@ jobs:
       - name: Save Atlantis data
         id: save-atlantis-data
         uses: actions/cache/save@v3
+        if: github.event_name == 'issue_comment'
         with:
           path: /atlantis-data
           key: atlantis-data-${{ github.event.issue.number }}
