@@ -38,7 +38,7 @@ jobs:
       volumes:
         - ${{ github.workspace }}/atlantis-data:/atlantis-data
     steps:
-#      # Use GitHub's OIDC provider to with a configured AWS IAM Identity Provider endpoint to assume role
+#      # Use GitHub's OIDC provider with a configured AWS IAM Identity Provider endpoint to assume role
 #      - name: Configure AWS Credentials
 #        uses: aws-actions/configure-aws-credentials@v2
 #        with:
