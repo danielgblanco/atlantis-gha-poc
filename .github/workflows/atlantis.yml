@@ -48,9 +48,17 @@ jobs:
 #          role-to-assume: arn:aws:iam::123456789100:role/my-terraform-state-role
 #          aws-region: eu-west-1
 
-      - name: Restore Atlantis data
-        id: restore-atlantis-data
-        uses: actions/cache/restore@v3
+#       - name: Restore Atlantis data
+#         id: restore-atlantis-data
+#         uses: actions/cache/restore@v3
+#         if: github.event_name == 'issue_comment'
+#         with:
+#           path: /atlantis-data
+#           key: atlantis-data-${{ github.event.issue.number }}
+          
+      - name: Cache Atlantis data
+        id: cache-atlantis-data
+        uses: actions/cache@v3
         if: github.event_name == 'issue_comment'
         with:
           path: /atlantis-data
@@ -86,10 +94,10 @@ jobs:
           kill $atlantis_pid
           wait $atlantis_pid
 
-      - name: Save Atlantis data
-        id: save-atlantis-data
-        uses: actions/cache/save@v3
-        if: github.event_name == 'issue_comment'
-        with:
-          path: /atlantis-data
-          key: atlantis-data-${{ github.event.issue.number }}
+#       - name: Save Atlantis data
+#         id: save-atlantis-data
+#         uses: actions/cache/save@v3
+#         if: github.event_name == 'issue_comment'
+#         with:
+#           path: /atlantis-data
+#           key: atlantis-data-${{ github.event.issue.number }}
